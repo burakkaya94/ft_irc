@@ -5,21 +5,27 @@
 #include <netinet/in.h>
 #include <string>
 #include <stdexcept>
-#include <cerrno>
+#include <iostream>
+#include <map>
+#include <Channel.hpp>
+#include <User.hpp>
 
 class	Server
 {
 	private:
-		struct sockaddr_in	srv;
-		int			serverfd;
-		std::string const	pass;
+		std::map<std::string, Channel *>	channels;
+		struct sockaddr_in			server_sk;
+		int					server_fd;
+		std::string const			password;
 
 		Server();
 		Server(Server const &src);
 		Server	&operator=(Server const &src);
 	public:
-		Server(std::string const *port, std::string const *pass);
+		Server(std::string const port, std::string const psw);
 		~Server();
+
+		bool	accept_req(void);
 };
 
 #endif

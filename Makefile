@@ -1,8 +1,8 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -Werror
+CXXFLAGS = -Wall -Wextra
 CPPFLAGS = -Iinc/
-SRCS = src/Server.cpp
-OBJS = $(SRCS:.c=.o)
+SRCS = main.cpp src/Server.cpp src/Channel.cpp src/User.cpp
+OBJS = $(SRCS:.cpp=.o)
 NAME = ircserv
 RM = rm -rf
 
@@ -11,9 +11,9 @@ RM = rm -rf
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OBJS) -o $(NAME)
 $(OBJS): %.o : %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 clean:
 	$(RM) $(NAME)
 fclean: clean
