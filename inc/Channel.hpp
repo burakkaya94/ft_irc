@@ -10,12 +10,13 @@ class	Channel
 	private:
 		std::map<std::string, User *>	users;
 		std::string			cname;
+		int				cmode;
 
 		Channel();
 		Channel(Channel const &src);
 		Channel	&operator=(Channel const &src);
 	public:
-		Channel(std::string const &nm);
+		Channel(std::string const &nm, int md);
 		~Channel();
 
 		bool	add_user();

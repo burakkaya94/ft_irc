@@ -16,7 +16,7 @@ Channel		&Channel::operator=(Channel const &src)
 	return (*this);
 }
 
-Channel::Channel(std::string const &nm)
+Channel::Channel(std::string const &nm, int md)
 {
 }
 

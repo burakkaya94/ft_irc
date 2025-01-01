@@ -6,7 +6,9 @@
 class	User
 {
 	private:
+		std::string	nname;
 		std::string	uname;
+		std::string	hname;
 		int		utype;
 
 		User();

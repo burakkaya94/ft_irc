@@ -45,6 +45,7 @@ Server::Server(std::string const port, std::string const psw): password(psw)
 		throw	std::runtime_error("socket binding");
 	if (listen(server_fd, 128) == -1)
 		throw	std::runtime_error("socket listening");
+	addToList(server_fd);
 	std::cout << "server listening on port " << p_num << std::endl;
 }
 
@@ -52,7 +53,54 @@ Server::~Server()
 {
 }
 
-bool	Server::accept_req(void)
+void	Server::startServer()
 {
+	int	count;
 
+	while (1)
+	{
+		count = poll(fd_list.begin(), static_cast<nfds_t>(fd_list.size()), 0);
+		if (count == -1)
+		{
+			
+		}
+		else if (count > 0)
+		{
+		}
+	}
+}
+
+bool	Server::acceptReq()
+{
+	
+}
+
+bool	Server::checkPoll()
+{
+	if (poll(fd_list.begin(), static_cast<nfds_t>(fd_list.size()), 0) > 0)
+		return (true);
+	return (false);
+}
+
+void	Server::addToList(int fd)
+{
+	struct pollfd	tmp;
+
+	tmp.fd = fd;
+	tmp.events = POLLIN | POLLOUT;
+	tmp.revents = 0;
+	fds.push_back(tmp);
+}
+
+void	Server::rmvFromList(int fd)
+{
+	for (std::vector<struct pollfd>::iterator it = fd_list.begin();
+		it != fd_list.end(), it++)
+	{
+		if (it->fd == fd)
+		{
+			close(fd);
+			fd_list.erase(it);
+		}
+	}
 }

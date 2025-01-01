@@ -13,6 +13,8 @@ int	main(int argc, char **argv)
 	try
 	{
 		Server	irc(argv[1], argv[2]);
+
+		irc.startServer();
 	}
 	catch (std::invalid_argument &e)
 	{

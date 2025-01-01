@@ -9,11 +9,15 @@
 #include <map>
 #include <Channel.hpp>
 #include <User.hpp>
+#include <poll.h>
+#include <vector>
 
 class	Server
 {
 	private:
 		std::map<std::string, Channel *>	channels;
+		std::map<int fd, User *>		clients;
+		std::vector<struct pollfd>		fd_list;
 		struct sockaddr_in			server_sk;
 		int					server_fd;
 		std::string const			password;
@@ -24,8 +28,12 @@ class	Server
 	public:
 		Server(std::string const port, std::string const psw);
 		~Server();
-
-		bool	accept_req(void);
+		
+		void	startServer();
+		bool	acceptReq();
+		bool	checkPoll();
+		void	addToList(int fd);
+		void	rmvFromList(int fd);
 };
 
 #endif
