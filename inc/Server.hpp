@@ -30,6 +30,7 @@ class	Server
 		Server(std::string const port, std::string const psw);
 		~Server();
 		
+		bool	acceptReq();
 		void	startServer();
 		bool	checkList();
 		bool	checkPoll();

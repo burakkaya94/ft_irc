@@ -19,7 +19,9 @@ Server	&Server::operator=(Server const &src)
 Server::Server(std::string const port, std::string const psw): password(psw)
 {
 	long	p_num;
+	int	is_it;
 
+	is_it = 1;
 	if (port.find_first_not_of("0123456789") != std::string::npos)
 		throw	std::invalid_argument("port is invalid");
 	if (port.size() > 5)
@@ -41,11 +43,13 @@ Server::Server(std::string const port, std::string const psw): password(psw)
 	server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (server_fd == -1)
 		throw	std::runtime_error("socket allocation");
+	if (fcntl(server_fd, F_SETFL, O_NONBLOCK) == -1)
+		throw	std::runtime_error("socket blocking");
 	if (bind(server_fd, (struct sockaddr const *)&server_sk, sizeof(server_sk)) == -1)
 		throw	std::runtime_error("socket binding");
 	if (listen(server_fd, 128) == -1)
 		throw	std::runtime_error("socket listening");
-	//add setsockopt here for server_fd
+	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &is_it, sizeof(is_it));
 	addToList(server_fd);
 	std::cout << "server listening on port " << p_num << std::endl;
 }
@@ -54,13 +58,18 @@ Server::~Server()
 {
 }
 
+bool	Server::acceptReq(int fd)
+{
+
+}
+
 void	Server::startServer()
 {
 	int	count;
 
 	while (1)
 	{
-		count = poll(fd_list.data(), static_cast<nfds_t>(fd_list.size()), 0);
+		count = poll(fd_list.data(), static_cast<nfds_t>(fd_list.size()), -1);
 		if (count == -1)
 		{
 			std::cout << "poll() error" << std::endl;
@@ -75,17 +84,18 @@ void	Server::startServer()
 
 bool	Server::checkList()
 {
-	int	ret;
+	int	clientfd;
 
 	for (std::vector<struct pollfd>::iterator it = fd_list.begin();
 		it != fd_list.end(); it++)
 	{
 		if ((it->fd == server_fd) && (it->revents & POLLIN))
 		{
-			ret = accept(server_fd, NULL, NULL);
-			if (ret == -1)
+			clientfd = accept(server_fd, NULL, NULL);
+			if (clientfd == -1)
 				continue ;
-			
+			fcntl(clientfd, F_SETFL, O_NONBLOCK);
+			acceptReq(clientfd);
 		}
 	}
 }
