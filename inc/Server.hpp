@@ -33,9 +33,9 @@ class	Server
 		bool	acceptReq();
 		void	startServer();
 		bool	checkList();
-		bool	checkPoll();
 		void	addToList(int fd);
 		void	rmvFromList(int fd);
+		void	parseIt();
 };
 
 #endif

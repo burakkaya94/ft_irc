@@ -58,9 +58,17 @@ Server::~Server()
 {
 }
 
-bool	Server::acceptReq(int fd)
+bool	Server::acceptReq()
 {
+	int	client_fd;
 
+	client_fd = accept(server_fd, NULL, NULL);
+	if (client_fd == -1)
+		return (false);
+	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) == -1)
+		return (false);
+	addToList(client_fd);
+	return (true);
 }
 
 void	Server::startServer()
@@ -84,28 +92,23 @@ void	Server::startServer()
 
 bool	Server::checkList()
 {
-	int	clientfd;
-
 	for (std::vector<struct pollfd>::iterator it = fd_list.begin();
 		it != fd_list.end(); it++)
 	{
 		if ((it->fd == server_fd) && (it->revents & POLLIN))
 		{
-			clientfd = accept(server_fd, NULL, NULL);
-			if (clientfd == -1)
+			if (acceptReq() == 0)
 				continue ;
-			fcntl(clientfd, F_SETFL, O_NONBLOCK);
-			acceptReq(clientfd);
+			it = fd_list.begin();
+			continue ;
+		}
+		else if (it->revents & POLLIN)
+		{
+			parseIt(it->fd);
+			engine();
 		}
 	}
 }
-
-/*bool	Server::checkPoll()
-{
-	if (poll(fd_list.begin(), static_cast<nfds_t>(fd_list.size()), 0) > 0)
-		return (true);
-	return (false);
-}*/
 
 void	Server::addToList(int fd)
 {
@@ -128,4 +131,9 @@ void	Server::rmvFromList(int fd)
 			fd_list.erase(it);
 		}
 	}
+}
+
+void	Server::parseIt(int fd)
+{
+
 }
