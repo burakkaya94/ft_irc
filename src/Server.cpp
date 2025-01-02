@@ -92,7 +92,7 @@ void	Server::startServer()
 		}
 	}
 }
-bool	Server::checkList()
+void	Server::checkList()
 {
 	for (std::vector<struct pollfd>::iterator it = fd_list.begin();
 		it != fd_list.end(); it++)
@@ -148,24 +148,30 @@ Request	Server::fillRequest(std::string &reqStr)
 
 	if (reqStr[0] == ':'){
 		if(reqStr.find(' ') != std::string::npos)
-			ret.prefix = reqStr.substr(1, reqStr.find(' ') - 1);
+			ret.prefix = reqStr.substr(1, reqStr.find(' '));
 		else
 			ret.prefix = reqStr.substr(1);
-
-
+		reqStr = reqStr.substr(reqStr.find(' ') + 1);
+	}
+	if ((reqStr.find(' ') != std::string::npos)){
 	while (reqStr.find(' ') != std::string::npos){
-		if (reqStr.find(':', 1) != std::string::npos && reqStr.find(' ') > reqStr.find(':', 1))
+		if (reqStr.find(':') != std::string::npos && reqStr.find(' ') > reqStr.find(':'))
 			break;
 		ret.args.push_back(reqStr.substr(0, reqStr.find(' ')));
 		reqStr = reqStr.substr(reqStr.find(' ') + 1);
 	}
-	if (reqStr.find(':' , 1) != std::string::npos)
+	}
+		
+	if (reqStr.find(':') != std::string::npos){
 		ret.trailing = reqStr.substr(reqStr.find(':') + 1);
+		ret.args.push_back(reqStr.substr(0, reqStr.find(':')));
+	}
+	ret.args.push_back(reqStr);
 	ret.command = ret.args[0];
+	
 	return (ret);
 }
-
-}
+	
 bool	Server::parseRequest(int fd, Request &req)
 {
 	char buffer[512];
@@ -178,16 +184,17 @@ bool	Server::parseRequest(int fd, Request &req)
 	}
 	else{
 		if (reqStr.find("\r\n") != std::string::npos)
-			reqStr = reqStr.substr(0, reqStr.find("\r\n") - 1);
+			reqStr = reqStr.substr(0, reqStr.find("\r\n"));
 		else
 			return false;
 	}
+	memset(buffer, 0, sizeof(buffer));
 	req = fillRequest(reqStr);
 	//std::cout << "prefix: " << req.prefix << std::endl;
-	std::cout << "command: " << req.command << std::endl;
-	std::cout << "trailing: " << req.trailing << std::endl;
-	for (std::vector<std::string>::iterator it = req.args.begin(); it != req.args.end(); it++)
-		std::cout << "arg: " << *it << std::endl;
+		std::cout << "command: " << req.command << std::endl;
+		std::cout << "trailing: " << req.trailing << std::endl;
+		for (std::vector<std::string>::iterator it = req.args.begin(); it != req.args.end(); it++)
+			std::cout << "arg: " << *it << std::endl;
 	return true;
 }
 

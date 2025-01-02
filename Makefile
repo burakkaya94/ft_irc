@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra
+CXXFLAGS = -Wall -Wextra -Werror
 CPPFLAGS = -Iinc/
 SRCS = main.cpp src/Server.cpp src/Channel.cpp src/User.cpp
 OBJS = $(SRCS:.cpp=.o)

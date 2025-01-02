@@ -16,14 +16,11 @@ Channel		&Channel::operator=(Channel const &src)
 	return (*this);
 }
 
-Channel::Channel(std::string const &nm, int md)
-{
-}
+// Channel::Channel(std::string const &nm, int md)
+// {
+// }
 
 Channel::~Channel()
 {
 }
 
-bool	Channel::add_user()
-{
-}

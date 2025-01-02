@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <Request.hpp>
 #include <fcntl.h>
+#include <string.h>
 
 class	Server
 {
@@ -34,7 +35,7 @@ class	Server
 		
 		bool	acceptReq();
 		void	startServer();
-		bool	checkList();
+		void	checkList();
 		void	addToList(int fd);
 		void	rmvFromList(int fd);
 		void	handleClientRequest(int fd);
