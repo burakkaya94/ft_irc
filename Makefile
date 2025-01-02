@@ -1,4 +1,4 @@
-CXX = c++
+CXX = g++
 CXXFLAGS = -Wall -Wextra
 CPPFLAGS = -Iinc/
 SRCS = main.cpp src/Server.cpp src/Channel.cpp src/User.cpp

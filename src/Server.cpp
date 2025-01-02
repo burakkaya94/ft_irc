@@ -62,12 +62,15 @@ bool	Server::acceptReq()
 {
 	int	client_fd;
 
+	std::cout << "accepting request" << std::endl;
 	client_fd = accept(server_fd, NULL, NULL);
 	if (client_fd == -1)
 		return (false);
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) == -1)
 		return (false);
+	std::cout << "client connected" << std::endl;
 	addToList(client_fd);
+	std::cout << "client added to list" << std::endl;
 	return (true);
 }
 
@@ -103,6 +106,7 @@ bool	Server::checkList()
 		}
 		else if (it->revents & POLLIN)
 		{
+			std::cout << "client request" << std::endl;
 			handleClientRequest(it->fd);
 		}
 	}
@@ -179,7 +183,7 @@ bool	Server::parseRequest(int fd, Request &req)
 			return false;
 	}
 	req = fillRequest(reqStr);
-	std::cout << "prefix: " << req.prefix << std::endl;
+	//std::cout << "prefix: " << req.prefix << std::endl;
 	std::cout << "command: " << req.command << std::endl;
 	std::cout << "trailing: " << req.trailing << std::endl;
 	for (std::vector<std::string>::iterator it = req.args.begin(); it != req.args.end(); it++)
