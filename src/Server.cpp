@@ -138,11 +138,30 @@ void	Server::handleClientRequest(int fd)
 	parseRequest(fd, req);
 }
 
-Request	Server::fillRequest(std::string const &req)
+Request	Server::fillRequest(std::string &reqStr)
 {
-	
+	Request	ret;
+
+	if (reqStr[0] == ':'){
+		if(reqStr.find(' ') != std::string::npos)
+			ret.prefix = reqStr.substr(1, reqStr.find(' ') - 1);
+		else
+			ret.prefix = reqStr.substr(1);
+
+
+	while (reqStr.find(' ') != std::string::npos){
+		if (reqStr.find(':', 1) != std::string::npos && reqStr.find(' ') > reqStr.find(':', 1))
+			break;
+		ret.args.push_back(reqStr.substr(0, reqStr.find(' ')));
+		reqStr = reqStr.substr(reqStr.find(' ') + 1);
+	}
+	if (reqStr.find(':' , 1) != std::string::npos)
+		ret.trailing = reqStr.substr(reqStr.find(':') + 1);
+	ret.command = ret.args[0];
+	return (ret);
 }
 
+}
 bool	Server::parseRequest(int fd, Request &req)
 {
 	char buffer[512];
@@ -160,6 +179,11 @@ bool	Server::parseRequest(int fd, Request &req)
 			return false;
 	}
 	req = fillRequest(reqStr);
+	std::cout << "prefix: " << req.prefix << std::endl;
+	std::cout << "command: " << req.command << std::endl;
+	std::cout << "trailing: " << req.trailing << std::endl;
+	for (std::vector<std::string>::iterator it = req.args.begin(); it != req.args.end(); it++)
+		std::cout << "arg: " << *it << std::endl;
 	return true;
 }
 

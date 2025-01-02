@@ -12,7 +12,8 @@
 #include <poll.h>
 #include <vector>
 #include <unistd.h>
-#include "Request.hpp"
+#include <Request.hpp>
+#include <fcntl.h>
 
 class	Server
 {
@@ -38,7 +39,7 @@ class	Server
 		void	rmvFromList(int fd);
 		void	handleClientRequest(int fd);
 		bool	parseRequest(int fd, Request &req);
-		Request	fillRequest(std::string const &req);
+		Request fillRequest(std::string &reqStr);
 };
 
 #endif
