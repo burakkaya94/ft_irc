@@ -89,7 +89,6 @@ void	Server::startServer()
 		}
 	}
 }
-
 bool	Server::checkList()
 {
 	for (std::vector<struct pollfd>::iterator it = fd_list.begin();
@@ -104,8 +103,7 @@ bool	Server::checkList()
 		}
 		else if (it->revents & POLLIN)
 		{
-			parseIt(it->fd);
-			engine();
+			handleClientRequest(it->fd);
 		}
 	}
 }
@@ -133,7 +131,37 @@ void	Server::rmvFromList(int fd)
 	}
 }
 
-void	Server::parseIt(int fd)
+void	Server::handleClientRequest(int fd)
 {
+	Request	req;
 
+	parseRequest(fd, req);
 }
+
+Request	Server::fillRequest(std::string const &req)
+{
+	
+}
+
+bool	Server::parseRequest(int fd, Request &req)
+{
+	char buffer[512];
+	std::string reqStr;
+
+	int  bytesRead = recv(fd, buffer, sizeof(buffer), 0);
+	reqStr = std::string(buffer, bytesRead);
+	if (bytesRead <= 0){
+		return false;
+	}
+	else{
+		if (reqStr.find("\r\n") != std::string::npos)
+			reqStr = reqStr.substr(0, reqStr.find("\r\n") - 1);
+		else
+			return false;
+	}
+	req = fillRequest(reqStr);
+	return true;
+}
+
+
+

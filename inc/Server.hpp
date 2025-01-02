@@ -12,6 +12,7 @@
 #include <poll.h>
 #include <vector>
 #include <unistd.h>
+#include "Request.hpp"
 
 class	Server
 {
@@ -35,7 +36,9 @@ class	Server
 		bool	checkList();
 		void	addToList(int fd);
 		void	rmvFromList(int fd);
-		void	parseIt();
+		void	handleClientRequest(int fd);
+		bool	parseRequest(int fd, Request &req);
+		Request	fillRequest(std::string const &req);
 };
 
 #endif
