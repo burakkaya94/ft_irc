@@ -11,12 +11,13 @@
 #include <User.hpp>
 #include <poll.h>
 #include <vector>
+#include <unistd.h>
 
 class	Server
 {
 	private:
 		std::map<std::string, Channel *>	channels;
-		std::map<int fd, User *>		clients;
+		std::map<int, User *>			clients;
 		std::vector<struct pollfd>		fd_list;
 		struct sockaddr_in			server_sk;
 		int					server_fd;
@@ -30,7 +31,7 @@ class	Server
 		~Server();
 		
 		void	startServer();
-		bool	acceptReq();
+		bool	checkList();
 		bool	checkPoll();
 		void	addToList(int fd);
 		void	rmvFromList(int fd);
