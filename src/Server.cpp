@@ -174,23 +174,25 @@ Request	Server::fillRequest(std::string &reqStr)
 	
 bool	Server::parseRequest(int fd, Request &req)
 {
-	char buffer[512];
+	char buffer[8192];
 	std::string reqStr;
 
-	int  bytesRead = recv(fd, buffer, sizeof(buffer), 0);
-	reqStr = std::string(buffer, bytesRead);
-	if (bytesRead <= 0){
-		return false;
+	memset(buffer, 0, sizeof(buffer));
+	std::cout << "FD: " << fd << std::endl;
+	
+	while (recv(fd, buffer, sizeof(buffer), 0) > 0)
+	{
+		reqStr += buffer;
 	}
-	else{
+	
+	// std::cout << bytesRead << std::endl;
+	// for (int i = 0; i < 12; i++)
+	// 	std::cout << "buffer:" << i << " " << buffer[i] <<std::endl;
 		if (reqStr.find("\r\n") != std::string::npos)
 			reqStr = reqStr.substr(0, reqStr.find("\r\n"));
-		else
-			return false;
-	}
-	memset(buffer, 0, sizeof(buffer));
+	memset(&buffer, 0, sizeof(buffer));
 	req = fillRequest(reqStr);
-	//std::cout << "prefix: " << req.prefix << std::endl;
+	std::cout << "prefix: " << req.prefix << std::endl;
 		std::cout << "command: " << req.command << std::endl;
 		std::cout << "trailing: " << req.trailing << std::endl;
 		for (std::vector<std::string>::iterator it = req.args.begin(); it != req.args.end(); it++)
