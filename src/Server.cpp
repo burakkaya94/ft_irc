@@ -153,43 +153,37 @@ Request	Server::fillRequest(std::string &reqStr)
 			ret.prefix = reqStr.substr(1);
 		reqStr = reqStr.substr(reqStr.find(' ') + 1);
 	}
-	if ((reqStr.find(' ') != std::string::npos)){
 	while (reqStr.find(' ') != std::string::npos){
-		if (reqStr.find(':') != std::string::npos && reqStr.find(' ') > reqStr.find(':'))
+		while (reqStr[0] == ' ')
+				reqStr = reqStr.substr(1);
+		if (reqStr.find(':') != std::string::npos && reqStr.find(' ') != std::string::npos && reqStr.find(' ')  > reqStr.find(':'))
 			break;
-		ret.args.push_back(reqStr.substr(0, reqStr.find(' ')));
+		if (reqStr.find(' ') != std::string::npos)
+			ret.args.push_back(reqStr.substr(0, reqStr.find(' ')));
 		reqStr = reqStr.substr(reqStr.find(' ') + 1);
 	}
-	}
-		
-	if (reqStr.find(':') != std::string::npos){
-		ret.trailing = reqStr.substr(reqStr.find(':') + 1);
-		ret.args.push_back(reqStr.substr(0, reqStr.find(':')));
-	}
-	ret.args.push_back(reqStr);
-	ret.command = ret.args[0];
 	
+	if (reqStr.find(':') != std::string::npos)
+		ret.trailing = reqStr.substr(reqStr.find(':') + 1);
+	ret.command = ret.args[0];
 	return (ret);
 }
 	
 bool	Server::parseRequest(int fd, Request &req)
 {
-	char buffer[8192];
+	char buffer[512];
 	std::string reqStr;
 
 	memset(buffer, 0, sizeof(buffer));
 	std::cout << "FD: " << fd << std::endl;
 	
 	while (recv(fd, buffer, sizeof(buffer), 0) > 0)
-	{
 		reqStr += buffer;
-	}
-	
-	// std::cout << bytesRead << std::endl;
-	// for (int i = 0; i < 12; i++)
-	// 	std::cout << "buffer:" << i << " " << buffer[i] <<std::endl;
-		if (reqStr.find("\r\n") != std::string::npos)
-			reqStr = reqStr.substr(0, reqStr.find("\r\n"));
+
+	if (reqStr.find("\r\n") != std::string::npos)
+		reqStr = reqStr.substr(0, reqStr.find("\r\n"));
+	else
+		return (false);
 	memset(&buffer, 0, sizeof(buffer));
 	req = fillRequest(reqStr);
 	std::cout << "prefix: " << req.prefix << std::endl;
